@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html manifest="cache.appcache">
+<head>
+    <meta charset="UTF-8">
+    <title>Host Auto Cache(FW 4.XX-5.XX)</title>
+    <link rel="stylesheet prefetch" href="Style.css">
+    <script>
+        history.replaceState(null, null, 'index.html');
+    </script>
+</head>
+
+<style>
+body {
+    font-family: system-ui;
+    text-align: center;
+    background-color: #111112;
+    color: white;
+}
+h1 {
+    color: #fff;
+    font-size: 46px;
+    font-weight: bold;
+    text-shadow: 3px 2px #3d3939;
+}
+#progress {
+    font-size: 35px;
+    font-weight: bold;
+    text-shadow: 3px 2px #3d3939;
+    color: #fff;
+}
+.ready {
+    color: #87FF33;
+}
+</style>
+
+<body>
+    <br><br><br>
+    <h1><i>PS5 Jailbreak Auto Cache (Fw 4.XX-5.XX)</i></h1>
+    <br><br><br><br>
+    <div id="progress">
+        Caching files, please wait...
+    </div>
+    <div id="progress2" style="display:none; font-size: 28px; font-weight: bold; color: #87FF33; text-shadow: 3px 2px #3d3939; margin-top: 20px;">
+        Caching Update files, please wait...
+    </div>
+    <br><br><br><br><br><br>
+    
+    <!-- Footer -->
+    <div style="background-color:#043836; color:white; position:fixed; left:0; bottom:0; width:100%; text-align:center;">
+        <font style='color:#87FF33'>Modder & Dev : </font>
+        <a href="https://twitter.com/84Ciss" style='font-size:20px; text-align:center; color:yellow;'>@84Ciss</a>
+        - Find Me In Twitter if you have any kind of issues !
+        <br>
+        <font style='color:#87FF33'>Special thanks : </font>*Many Many Thanks to all Contributors in PS4/PS5 Scene ★*
+    </div>
+
+    <script>
+        var progress = document.getElementById('progress');
+        var progress2 = document.getElementById('progress2');
+        var redirected = false;
+        
+        // Détecter si c'est un UPDATE (venant de index.html avec manifest)
+        var isUpdate = (document.referrer && document.referrer.indexOf('index.html') !== -1);
+        
+        // Si c'est un update, afficher le message spécial
+        if (isUpdate) {
+            progress.style.display = 'none';
+            progress2.style.display = 'block';
+            console.log('[Cache] Mode UPDATE détecté');
+        } else {
+            console.log('[Cache] Mode PREMIER CACHE détecté');
+        }
+        
+        function redirectToIndex() {
+            if (redirected) return;
+            redirected = true;
+            localStorage.setItem("ps5_cached", "true");
+            window.location.replace("index.html");
+        }
+        
+        // Événement quand les fichiers sont mis en cache pour la première fois
+        window.applicationCache.addEventListener('cached', function() {
+            if (isUpdate) {
+                progress2.innerHTML = '<span class="ready">Update complete! Redirecting...</span>';
+            } else {
+                progress.innerHTML = '<span class="ready">Cache complete! Redirecting...</span>';
+            }
+            setTimeout(redirectToIndex, 800);
+        }, false);
+        
+        // Événement quand le cache est mis à jour
+        window.applicationCache.addEventListener('updateready', function() {
+            if (isUpdate) {
+                progress2.innerHTML = '<span class="ready">Update ready! Redirecting...</span>';
+            } else {
+                progress.innerHTML = '<span class="ready">Cache updated! Redirecting...</span>';
+            }
+            setTimeout(redirectToIndex, 800);
+        }, false);
+        
+        // Si déjà en cache (IDLE ou UPDATEREADY), rediriger immédiatement
+        if (window.applicationCache.status == 1 || window.applicationCache.status == 4) {
+            if (isUpdate) {
+                progress2.innerHTML = '<span class="ready">Already cached! Redirecting...</span>';
+            } else {
+                progress.innerHTML = '<span class="ready">Already cached! Redirecting...</span>';
+            }
+            setTimeout(redirectToIndex, 300);
+        }
+        
+        // Gestion des erreurs de cache
+        window.applicationCache.addEventListener('error', function() {
+            if (isUpdate) {
+                progress2.innerHTML = '<span style="color:#ee596f">Cache error! Redirecting anyway...</span>';
+            } else {
+                progress.innerHTML = '<span style="color:#ee596f">Cache error! Redirecting anyway...</span>';
+            }
+            setTimeout(redirectToIndex, 1500);
+        }, false);
+        
+        // Événement: Pas de mise à jour
+        window.applicationCache.addEventListener('noupdate', function() {
+            if (isUpdate) {
+                progress2.innerHTML = '<span class="ready">No update needed! Redirecting...</span>';
+            } else {
+                progress.innerHTML = '<span class="ready">No update needed! Redirecting...</span>';
+            }
+            setTimeout(redirectToIndex, 300);
+        }, false);
+    </script>
+</body>
+</html>

@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html>
+<!-- PAS DE MANIFEST = permet de nettoyer -->
+<head>
+    <meta charset="UTF-8">
+    <title>Clean Cache - PS5</title>
+    <style>
+        body {
+            font-family: system-ui;
+            text-align: center;
+            background-color: #111112;
+            color: white;
+            padding: 50px;
+        }
+        h1 {
+            color: #87FF33;
+            font-size: 50px;
+            margin-bottom: 30px;
+        }
+        .button-container {
+            margin: 40px 0;
+        }
+        button {
+            background-color: #043836;
+            color: white;
+            border: 3px solid #87FF33;
+            padding: 25px 50px;
+            font-size: 24px;
+            cursor: pointer;
+            border-radius: 15px;
+            margin: 15px;
+            transition: all 0.3s;
+        }
+        button:hover {
+            background-color: #87FF33;
+            color: #111112;
+            transform: scale(1.05);
+        }
+        .danger {
+            border-color: #ff5555;
+        }
+        .danger:hover {
+            background-color: #ff5555;
+            color: white;
+        }
+        #status {
+            margin-top: 40px;
+            font-size: 22px;
+            min-height: 100px;
+            padding: 20px;
+            background-color: #043836;
+            border-radius: 10px;
+            border: 2px solid #87FF33;
+        }
+        .success {
+            color: #87FF33;
+            font-weight: bold;
+        }
+        .error {
+            color: #ff5555;
+            font-weight: bold;
+        }
+        .info-box {
+            background-color: #043836;
+            padding: 20px;
+            margin: 30px auto;
+            max-width: 700px;
+            border-radius: 10px;
+            border: 2px solid #555;
+        }
+    </style>
+</head>
+<body>
+    <h1>🧹 PS5 Cache Cleaner</h1>
+    
+    <div class="info-box">
+        <h2 style="color: #87FF33;">État actuel du cache :</h2>
+        <p>localStorage.ps5_cached: <strong id="cache-status" style="color: #ff5555;">Vérification...</strong></p>
+        <p>ApplicationCache status: <strong id="appcache-status">Vérification...</strong></p>
+    </div>
+    
+    <div class="button-container">
+        <button onclick="clearCache()">🗑️ Clear Cache Only</button>
+        <br>
+        <button class="danger" onclick="clearAll()">💣 Clear ALL & Reload</button>
+    </div>
+    
+    <div id="status">
+        Clique sur un bouton pour nettoyer le cache...
+    </div>
+    
+    <div class="info-box">
+        <h3 style="color: #87FF33;">📋 Instructions :</h3>
+        <p><strong>Clear Cache Only</strong> : Efface juste localStorage/sessionStorage</p>
+        <p><strong>Clear ALL & Reload</strong> : Efface tout et recharge cache.html</p>
+    </div>
+    
+    <!-- Footer -->
+    <div style="background-color:#043836; color:white; position:fixed; left:0; bottom:0; width:100%; text-align:center; padding:15px;">
+        <font style='color:#87FF33'>Modder & Dev : </font>
+        <a href="https://twitter.com/84Ciss" style='color:yellow; text-decoration:none;'>@84Ciss</a>
+    </div>
+    
+    <script>
+        // Afficher le statut actuel
+        function updateStatus() {
+            try {
+                const cached = localStorage.getItem("ps5_cached");
+                const statusEl = document.getElementById("cache-status");
+                if (cached === "true") {
+                    statusEl.textContent = "CACHED ✅";
+                    statusEl.style.color = "#87FF33";
+                } else {
+                    statusEl.textContent = "NOT CACHED ❌";
+                    statusEl.style.color = "#ff5555";
+                }
+                
+                const appCacheStatus = window.applicationCache.status;
+                const statusNames = ["UNCACHED", "IDLE", "CHECKING", "DOWNLOADING", "UPDATEREADY", "OBSOLETE"];
+                document.getElementById("appcache-status").textContent = statusNames[appCacheStatus] || "UNKNOWN";
+            } catch(e) {
+                document.getElementById("cache-status").textContent = "ERROR";
+                document.getElementById("appcache-status").textContent = "ERROR";
+            }
+        }
+        
+        // Nettoyer juste le cache
+        function clearCache() {
+            const status = document.getElementById('status');
+            try {
+                // Clear localStorage
+                localStorage.removeItem("ps5_cached");
+                
+                // Clear sessionStorage
+                sessionStorage.clear();
+                
+                status.innerHTML = '<span class="success">✅ Cache nettoyé avec succès !</span><br><br>localStorage et sessionStorage effacés.';
+                
+                // Mettre à jour le statut
+                setTimeout(updateStatus, 500);
+            } catch(e) {
+                status.innerHTML = '<span class="error">❌ Erreur : ' + e.message + '</span>';
+            }
+        }
+        
+        // Tout nettoyer et recharger
+        function clearAll() {
+            const status = document.getElementById('status');
+            try {
+                // Clear localStorage
+                localStorage.clear();
+                
+                // Clear sessionStorage
+                sessionStorage.clear();
+                
+                status.innerHTML = '<span class="success">✅ Tout nettoyé ! Redirection vers cache.html...</span>';
+                
+                setTimeout(function() {
+                    window.location.replace("cache.html");
+                }, 1500);
+            } catch(e) {
+                status.innerHTML = '<span class="error">❌ Erreur : ' + e.message + '</span>';
+            }
+        }
+        
+        // Mettre à jour le statut au chargement
+        updateStatus();
+        
+        // Rafraîchir toutes les 2 secondes
+        setInterval(updateStatus, 2000);
+    </script>
+</body>
+</html>

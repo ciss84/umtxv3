@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html manifest="cache.appcache">
+<head>
+    <meta charset="UTF-8">
+    <title>84Ciss UMTX2 (4.XX-5.XX)</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="main.css">
+    <style>
+        /* Bouton Clear Cache */
+        .clear-cache-btn {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background-color: #ff5555;
+            color: white;
+            border: 2px solid white;
+            padding: 10px 20px;
+            font-size: 14px;
+            cursor: pointer;
+            border-radius: 8px;
+            z-index: 9999;
+            transition: all 0.3s;
+        }
+        .clear-cache-btn:hover {
+            background-color: #ff7777;
+            transform: scale(1.05);
+        }
+    </style>
+    <script>
+        // Vérifier si le cache est prêt, sinon rediriger vers cache.html
+        if (!localStorage.getItem("ps5_cached")) {
+            window.location.replace("cache.html");
+        }
+    </script>
+</head>
+
+<body>
+    <!-- Bouton Clear Cache -->
+    <button class="clear-cache-btn" onclick="clearCache()">🗑️ Clear Cache</button>
+
+    <!-- L2 Redirect Button -->
+    <div class="position-absolute d-flex align-items-center top-0 left-0 m-4">
+        <div class="l2-redirect-box">L2</div>
+        <span class="ml-2">Redirect</span>
+    </div>
+
+    <!-- Row 1: Header -->
+    <div class="p-2">
+        <h1 class="text-center">Auto Jailbreak UMTX V2 (4.XX-5.XX)</h1>
+        <p class="text-center" id="top-bar-text">
+            Current firmware: <span class="fw-bold" id="current-fw"></span>
+        </p>
+        
+        <!-- Toast notifications container -->
+        <div id="toast-container"></div>
+    </div>
+
+    <!-- Row 2: Main Content -->
+    <div id="main-content">
+        <!-- Pre-jailbreak view -->
+        <div id="pre-jb-view" class="d-flex align-items-center justify-content-center flex-direction-column selected">
+            <a tabindex="0" id="run-jb" onclick="run()"></a>
+        </div>
+
+        <!-- Console view -->
+        <div id="console-view">
+            <div id="console" class="log"></div>
+        </div>
+
+        <!-- Payloads view -->
+        <div id="payloads-view"></div>
+    </div>
+
+    <!-- Row 3: Footer -->
+    <div class="position-relative text-center p-2 mb-2">
+        <p class="text-secondary" id="version">Special thanks to idlesauce</p>
+        
+        <h3 class="text-secondary mt-2">
+            <a href="https://github.com/shahrilnet">@shahrilnet</a>,
+            <a href="https://github.com/n0llptr">@n0llptr</a>,
+            <a href="https://x.com/fail0verflow">@fail0verflow</a>,
+            <a href="https://twitter.com/flat_z">@flat_z</a>,
+            <a href="https://twitter.com/SpecterDev">@SpecterDev</a>,
+            ChendoChap,
+            SlidyBat,
+            abc/psfree,
+            <br>
+            idlesauce,
+            <a href="https://x.com/znullptr">@znullptr</a>,
+            <a href="https://twitter.com/notnotzecoxao">@notnotzecoxao</a>,
+            <a href="https://twitter.com/SocraticBliss">@SocraticBliss</a>,
+            <a href="https://github.com/john-tornblom">John Tornblom</a>,
+            <a href="https://discord.gg/kbrzGuH3F6">PS5 R&D Discord</a>
+        </h3>
+    </div>
+
+    <!-- Bottom Footer Bar -->
+    <div style="background-color:#043836; color:white; position:fixed; left:0; bottom:0; width:100%; text-align:center;">
+        <font style='color:#87FF33'>Modder & Dev : </font>84Ciss - Find Me In Twitter if you have any kind of issues !&nbsp;
+        <a href="https://twitter.com/84Ciss" style='font-size:20px; text-align:center; color:yellow;'>@84Ciss</a>
+        <br>
+        <font style='color:#87FF33'>Special thanks : </font>*Many Many Thanks to all Contributors in PS4/PS5 Scene ★*
+    </div>
+
+    <!-- Core Scripts -->
+    <script src="int64.js"></script>
+    <script src="rop.js"></script>
+    <script src="main.js"></script>
+    <script src="stability-enhancements.js"></script>
+    <script src="umtx2.js"></script>
+    <script src="custom_host_stuff.js"></script>
+    <script src="syscalls.js"></script>
+    <script type="module" src="psfree.js"></script>
+    <script src="payload_map.js"></script>
+
+    <!-- Cache Management Scripts -->
+    <script>
+        // Fonction Clear Cache
+        function clearCache() {
+            if (confirm('Voulez-vous vraiment effacer le cache ?\n\nCela vous redirigera vers cache.html.')) {
+                try {
+                    localStorage.removeItem("ps5_cached");
+                    sessionStorage.clear();
+                    window.location.replace("cache.html");
+                } catch(e) {
+                    alert('Erreur: ' + e.message);
+                }
+            }
+        }
+        
+        // Détection automatique des mises à jour du cache
+        if (window.applicationCache) {
+            var appCache = window.applicationCache;
+            
+            // DÉTECTER LE DOWNLOADING - Rediriger vers cache.html
+            appCache.addEventListener('downloading', function(e) {
+                console.log('[Cache] Téléchargement détecté - Redirection vers cache.html...');
+                
+                // Effacer le flag pour forcer cache.html à tout re-télécharger
+                localStorage.removeItem("ps5_cached");
+                
+                // Rediriger immédiatement vers cache.html
+                window.location.replace("cache.html");
+            }, false);
+            
+            // Logs pour debug
+            appCache.addEventListener('checking', function(e) {
+                console.log('[Cache] Vérification des mises à jour...');
+            }, false);
+            
+            appCache.addEventListener('updateready', function(e) {
+                console.log('[Cache] Mise à jour prête');
+            }, false);
+            
+            appCache.addEventListener('progress', function(e) {
+                if (e.lengthComputable) {
+                    var percent = Math.round((e.loaded / e.total) * 100);
+                    console.log('[Cache] Progression: ' + percent + '%');
+                }
+            }, false);
+            
+            appCache.addEventListener('cached', function(e) {
+                console.log('[Cache] Fichiers mis en cache ✅');
+            }, false);
+            
+            appCache.addEventListener('noupdate', function(e) {
+                console.log('[Cache] Cache à jour ✅');
+            }, false);
+            
+            appCache.addEventListener('error', function(e) {
+                console.error('[Cache] Erreur de mise à jour');
+            }, false);
+        }
+    </script>
+
+    <!-- Initialization Scripts -->
+    <script>
+        // Protection double exec
+        let _jbr = false;
+        
+        // Auto-run jailbreak after delay
+        setTimeout(() => {
+            if (!_jbr) document.getElementById('run-jb').click();
+        }, 1500);
+        
+        // Global error handler - NON BLOQUANT
+        addEventListener('unhandledrejection', (event) => {
+            console.error('[JB ERROR]', event.reason);
+            event.preventDefault(); // Pas d'alerte bloquante
+        });
+        
+        // Wrapper run() protection
+        if (typeof run === 'function') {
+            const _or = run;
+            window.run = function() {
+                if (_jbr) return;
+                _jbr = true;
+                try { return _or.apply(this, arguments); }
+                finally { setTimeout(() => _jbr = false, 1000); }
+            };
+        }
+        
+        // Display current firmware - SAFE
+        try {
+            document.getElementById("current-fw").innerHTML = fw_str;
+        } catch(e) {}
+        
+        // Register event handlers - SAFE
+        try {
+            registerAppCacheEventHandlers();
+        } catch(e) {}
+        
+        try {
+            registerL2ButtonHandler();
+        } catch(e) {}
+        
+        // Handle autoload from session storage - SAFE
+        window.onload = function() {
+            try {
+                let autoload = sessionStorage.getItem(SESSIONSTORE_ON_LOAD_AUTORUN_KEY);
+                if (autoload && !_jbr) {
+                    run(autoload == "wkonly", false);
+                }
+            } catch(e) {}
+        };
+    </script>
+</body>
+</html>
